@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "GitHub PR Reviewer",
+  "version": "1.0",
+  "description": "An extension to help review GitHub Pull Requests.",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": ["https://github.com/*"],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {}
+  },
+  "icons": {},
+  "content_scripts": [
+    {
+      "matches": ["https://github.com/*/*/pull/*"],
+      "js": ["content/content.js"]
+    }
+  ]
+}
