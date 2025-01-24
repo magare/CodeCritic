@@ -15,6 +15,8 @@
         --color-accent-emphasis: #0969da;
         --color-success-fg: #1a7f37;
         --color-danger-fg: #cf222e;
+        --color-neutral-muted: #afb8c1;
+        --color-neutral-subtle: #f6f8fa;
       }
 
       body {
@@ -30,17 +32,28 @@
         background-color: var(--color-canvas-default);
         border: 1px solid var(--color-border-default);
         border-radius: 6px;
-        padding: 8px;
-        margin: 8px;
+        padding: 16px;
+        margin: 16px;
+      }
+
+      h1, h2, h3 {
+        font-weight: 600;
+        margin-top: 0;
+        margin-bottom: 16px;
       }
 
       h1 {
         font-size: 20px;
-        font-weight: 600;
-        margin-top: 0;
-        margin-bottom: 16px;
         padding-bottom: 8px;
         border-bottom: 1px solid var(--color-border-default);
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+
+      h3 {
+        font-size: 16px;
       }
 
       label {
@@ -90,7 +103,7 @@
       }
 
       button:disabled {
-        background-color: #94d3a2;
+        background-color: var(--color-neutral-muted);
         cursor: not-allowed;
       }
 
@@ -101,7 +114,7 @@
         font-size: 14px;
       }
 
-      #results {
+      #results, #review-container {
         margin-top: 16px;
         border-top: 1px solid var(--color-border-default);
         padding-top: 16px;
@@ -124,7 +137,7 @@
         border-bottom-left-radius: 0;
       }
 
-      .result-item {
+      .result-item, .comment {
         margin-bottom: 16px;
         border: 1px solid var(--color-border-default);
         border-radius: 6px;
@@ -132,7 +145,7 @@
         background-color: var(--color-canvas-subtle);
       }
 
-      .result-heading {
+      .result-heading, .comment-header {
         font-size: 16px;
         font-weight: 600;
         margin-top: 0;
@@ -162,13 +175,18 @@
         font-weight: 600;
       }
 
-      .result-code-block {
-    
+      .result-code-block, .code-block {
         font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
           Liberation Mono, monospace;
         font-size: 12px;
         line-height: 1.4;
-        display: inline;
+        background-color: var(--color-neutral-subtle);
+        border: 1px solid var(--color-border-default);
+        border-radius: 6px;
+        padding: 8px;
+        margin: 8px 0;
+        overflow-x: auto;
+        white-space: pre-wrap;
       }
 
       .tooltip {
@@ -180,8 +198,8 @@
       .tooltip .tooltiptext {
         visibility: hidden;
         width: 200px;
-        background-color: #555;
-        color: #fff;
+        background-color: var(--color-neutral-muted);
+        color: var(--color-fg-default);
         text-align: center;
         border-radius: 6px;
         padding: 5px;
@@ -211,7 +229,6 @@
       }
 
       .link-button:hover {
-        background: none;
         color: var(--color-accent-emphasis);
       }
 
@@ -221,62 +238,25 @@
         color: var(--color-success-fg);
       }
 
-      #review-container {
-        padding: 10px;
-      }
-
-      #summary {
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-        padding: 10px;
-      }
-
-      #summary h3 {
-        margin-top: 0;
-      }
-
-      .comment {
-        border: 1px solid #ccc;
-        padding: 10px;
-        margin-bottom: 10px;
-      }
-
-      .comment-header {
-        font-weight: bold;
-        margin-bottom: 5px;
-      }
-
       .comment-header .file {
-        color: blue; /* Make file paths stand out */
-        cursor: pointer; /* If you make them clickable */
-      }
-
-      .comment-header .category {
-        /* Style based on severity */
+        color: var(--color-accent-fg);
+        cursor: pointer;
       }
 
       .comment-header .high {
-        color: red;
+        color: var(--color-danger-fg);
       }
 
       .comment-header .medium {
-        color: orange;
+        color: #f0883e;
       }
 
       .comment-header .low {
-        color: green;
+        color: var(--color-success-fg);
       }
 
       .comment-content {
         margin-bottom: 5px;
-      }
-
-      .code-block {
-        background-color: #eee;
-        padding: 5px;
-        font-family: monospace;
-        white-space: pre-wrap; /* Preserve line breaks */
-        overflow-x: auto;
       }
     </style>
   </head>
