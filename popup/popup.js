@@ -315,6 +315,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let formattedText = markdownText;
 
+    // Remove the final message about questions and suggestions
+    formattedText = formattedText.replace(
+      /---\s*If you have any questions.*$/,
+      ""
+    );
+
+    // Add colored backgrounds for severity levels
+    formattedText = formattedText.replace(
+      /\[(.*?)\] - (High|Medium|Low)/g,
+      (match, category, severity) => {
+        const severityClass = {
+          High: "severity-high",
+          Medium: "severity-medium",
+          Low: "severity-low",
+        }[severity];
+
+        return `[${category}] - <span class="${severityClass}">${severity}</span>`;
+      }
+    );
+
     // Convert Markdown headings
     formattedText = formattedText.replace(
       /^## (.*$)/gim,
@@ -325,14 +345,10 @@ document.addEventListener("DOMContentLoaded", function () {
       '<h3 class="result-subheading">$1</h3>'
     );
 
-    // Convert bullet points
+    // Convert numbered lists with file paths
     formattedText = formattedText.replace(
-      /^\* (.*$)/gim,
-      '<li class="result-list-item">$1</li>'
-    );
-    formattedText = formattedText.replace(
-      /(<li.*<\/li>)/gim,
-      '<ul class="result-list">$1</ul>'
+      /^\d+\.\s+File:\s+(.*?)(\s+\(Line:.*?\))/gim,
+      '<div class="review-item"><div class="file-path">$1</div><div class="line-info">$2</div>'
     );
 
     // Convert code blocks
@@ -361,6 +377,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Replace newlines with <br> tags
     formattedText = formattedText.replace(/\n/g, "<br>");
+
+    // Close the review-item div for each item
+    formattedText = formattedText.replace(
+      /<br><br>(?=<div class="review-item">|$)/g,
+      "</div><br>"
+    );
 
     return `<div class="result-container">${formattedText}</div>`;
   }
