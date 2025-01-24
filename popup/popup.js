@@ -67,6 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     statusDiv.textContent = `Reviewing PR: ${prTitle}...`;
+    console.log("resultsDiv", resultsDiv);
     resultsDiv.innerHTML = ""; // Clear previous results
 
     // Get the current values from inputs instead of storage
@@ -295,73 +296,73 @@ document.addEventListener("DOMContentLoaded", function () {
     sender,
     sendResponse
   ) {
+    console.log("Received message:", request); // Debug log
     if (request.type === "review-results") {
       if (request.data.error) {
-        statusDiv.textContent = `Error reviewing PR: ${request.data.prTitle} - ${request.data.error}`;
+        statusDiv.textContent = `Error reviewing PR: ${request.data.error}`;
         resultsDiv.innerHTML = "";
-
-        // Store the error state
-        chrome.storage.local.set({
-          lastReviewResult: {
-            error: request.data.error,
-            prTitle: request.data.prTitle,
-            timestamp: new Date().toISOString(),
-          },
-        });
       } else {
         statusDiv.textContent = `Review Complete for PR: ${request.data.prTitle}`;
-        resultsDiv.innerHTML = formatReviewResults(request.data.summary);
-
-        // Store the successful result
-        chrome.storage.local.set({
-          lastReviewResult: {
-            summary: request.data.summary,
-            prTitle: request.data.prTitle,
-            timestamp: new Date().toISOString(),
-          },
-        });
+        const formattedResults = formatReviewResults(request.data.summary);
+        console.log("Formatted results:", formattedResults); // Debug log
+        resultsDiv.innerHTML = formattedResults;
       }
     }
   });
 
   function formatReviewResults(markdownText) {
-    // Convert Markdown headings to <h2> and <h3> with appropriate classes
-    markdownText = markdownText.replace(
+    if (!markdownText) return "";
+
+    let formattedText = markdownText;
+
+    // Convert Markdown headings
+    formattedText = formattedText.replace(
       /^## (.*$)/gim,
       '<h2 class="result-heading">$1</h2>'
     );
-    markdownText = markdownText.replace(
+    formattedText = formattedText.replace(
       /^### (.*$)/gim,
       '<h3 class="result-subheading">$1</h3>'
     );
 
-    // Convert numbered lists to <ol> and <li>, adding a class to the list
-    markdownText = markdownText.replace(
-      /^\d+\. (.*$)/gim,
+    // Convert bullet points
+    formattedText = formattedText.replace(
+      /^\* (.*$)/gim,
       '<li class="result-list-item">$1</li>'
     );
-    markdownText = markdownText.replace(
-      /(<li>.*<\/li>)/gim,
-      '<ol class="result-list">$1</ol>'
+    formattedText = formattedText.replace(
+      /(<li.*<\/li>)/gim,
+      '<ul class="result-list">$1</ul>'
     );
 
-    // Convert bold patterns to <strong> tags
-    markdownText = markdownText.replace(
+    // Convert code blocks
+    formattedText = formattedText.replace(
+      /```(\w+)?\n([\s\S]*?)```/gm,
+      '<pre class="result-code-block"><code>$2</code></pre>'
+    );
+
+    // Convert inline code
+    formattedText = formattedText.replace(
+      /`([^`]+)`/g,
+      '<code class="result-inline-code">$1</code>'
+    );
+
+    // Convert bold text
+    formattedText = formattedText.replace(
       /\*\*(.*?)\*\*/g,
       '<strong class="result-bold">$1</strong>'
     );
 
-    // Convert code block patterns to <pre><code>, adding a class to the <pre> element
-    markdownText = markdownText.replace(
-      /`(.*?)`/gs,
-      '<pre class="result-code-block"><code>$1</code></pre>'
+    // Convert italics
+    formattedText = formattedText.replace(
+      /\*(.*?)\*/g,
+      '<em class="result-italic">$1</em>'
     );
 
     // Replace newlines with <br> tags
-    markdownText = markdownText.replace(/\n/g, "<br>");
+    formattedText = formattedText.replace(/\n/g, "<br>");
 
-    // Wrap the entire result in a <div> with a class for styling
-    return `<div class="result-item">${markdownText}</div>`;
+    return `<div class="result-container">${formattedText}</div>`;
   }
 
   // Load settings from storage
@@ -401,7 +402,10 @@ document.addEventListener("DOMContentLoaded", function () {
       statusDiv.textContent = `Last review for PR: ${prTitle} (${reviewTime})`;
 
       // Display the results
-      resultsDiv.innerHTML = formatReviewResults(summary);
+      console.log("resultsDiv", resultsDiv);
+      if (resultsDiv) {
+        resultsDiv.innerHTML = formatReviewResults(summary);
+      }
     }
   }
 
