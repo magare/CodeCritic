@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "GitHub PR Reviewer",
+  "name": "Code Critic",
   "version": "1.0",
   "description": "An extension to help review GitHub Pull Requests.",
   "permissions": ["activeTab", "storage", "scripting"],
