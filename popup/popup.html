@@ -199,7 +199,8 @@
         font-weight: 600;
       }
 
-      .result-code-block, .code-block {
+      /* Code block styling */
+      pre.result-code-block {
         font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
           Liberation Mono, monospace;
         font-size: 12px;
@@ -211,34 +212,33 @@
         margin: 8px 0;
         overflow-x: auto;
         max-height: 400px;
+        white-space: pre !important;
+        tab-size: 2;
       }
 
-      .result-code-block code, .code-block code {
+      pre.result-code-block code {
         background: none;
         padding: 0;
         margin: 0;
         font-size: inherit;
         font-family: inherit;
         line-height: inherit;
-        white-space: pre;
+        white-space: pre !important;
         display: block;
         color: #e6edf3;
+        overflow-x: visible;
+        word-wrap: normal;
       }
 
-      /* Override some highlight.js styles */
+      /* Override highlight.js styles */
       .hljs {
         background: none !important;
         padding: 0 !important;
+        white-space: pre !important;
+        overflow-x: visible !important;
       }
 
-      /* Ensure proper line breaks */
-      .result-code-block code br, .code-block code br {
-        display: block;
-        content: '';
-        margin: 0;
-        padding: 0;
-      }
-
+      /* Inline code styling */
       .result-inline-code {
         font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
           Liberation Mono, monospace;

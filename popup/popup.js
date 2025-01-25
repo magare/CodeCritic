@@ -409,7 +409,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const temp = document.createElement("div");
         temp.textContent = code.trim();
         const escapedCode = temp.innerHTML;
-        return `<pre class="result-code-block"><code class="language-${lang}">${escapedCode}</code></pre>`;
+        // Remove any <br> tags and preserve newlines
+        const cleanCode = escapedCode
+          .replace(/<br\s*\/?>/g, "\n")
+          .replace(/&nbsp;/g, " ");
+        return `<pre class="result-code-block"><code class="language-${lang}">${cleanCode}</code></pre>`;
       }
     );
 
@@ -426,10 +430,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
 
     // Convert italics
-    formattedText = formattedText.replace(
-      /\*(.*?)\*/g,
-      '<em class="result-italic">$1</em>'
-    );
+    formattedText = formattedText.replace(/\*(.*?)\*/g, "<em>$1</em>");
 
     // Replace horizontal separators
     formattedText = formattedText.replace(
@@ -437,8 +438,15 @@ document.addEventListener("DOMContentLoaded", function () {
       '<hr class="review-separator">'
     );
 
-    // Replace newlines with <br> tags
-    formattedText = formattedText.replace(/\n/g, "<br>");
+    // Replace newlines with <br> tags AFTER code block conversion
+    // But NOT inside pre tags
+    formattedText = formattedText.replace(
+      /(<pre.*?>[\s\S]*?<\/pre>)|(\n)/g,
+      (match, pre, newline) => {
+        if (pre) return pre;
+        return newline ? "<br>" : match;
+      }
+    );
 
     // Close the review-item div for each item
     formattedText = formattedText.replace(
@@ -450,19 +458,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Use setTimeout to ensure the DOM is updated before highlighting
     setTimeout(() => {
-      highlightCode();
+      document.querySelectorAll("pre code").forEach((block) => {
+        if (!block.classList.contains("hljs")) {
+          hljs.highlightElement(block);
+        }
+      });
     }, 0);
 
     return container;
-  }
-
-  // Function to highlight code blocks
-  function highlightCode() {
-    document.querySelectorAll("pre code").forEach((block) => {
-      if (!block.classList.contains("hljs")) {
-        hljs.highlightElement(block);
-      }
-    });
   }
 
   // Load settings from storage
