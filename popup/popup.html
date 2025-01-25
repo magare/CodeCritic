@@ -4,11 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GitHub PR Reviewer</title>
-    <!-- Add Highlight.js -->
+    
+    <!-- External CSS Dependencies -->
     <link rel="stylesheet" href="../lib/highlight/github-dark.min.css" />
     <link rel="stylesheet" href="./popup.css" />
+    
+    <!-- Highlight.js Core -->
     <script src="../lib/highlight/highlight.min.js"></script>
-    <!-- Common languages -->
+    
+    <!-- Highlight.js Common Programming Languages -->
     <script src="../lib/highlight/javascript.min.js"></script>
     <script src="../lib/highlight/typescript.min.js"></script>
     <script src="../lib/highlight/python.min.js"></script>
@@ -31,13 +35,20 @@
     <script src="../lib/highlight/php.min.js"></script>
   </head>
   <body>
+    <!-- Main Container -->
     <div class="container">
+      <!-- Header Section with Logo -->
       <div class="header">
+        <!-- Split logo text with images for styling -->
         <img src="../icons/icon48.png" alt="Code Critic Logo" class="logo" />
         <h1>ode </h1>
         <img src="../icons/icon48.png" alt="Code Critic Logo" class="logo" />
         <h1>ritic</h1>
-      </div>      <div id="api-key-section">
+      </div>
+      
+      <!-- API Key Configuration Section -->
+      <div id="api-key-section">
+        <!-- API Key Input Form -->
         <div class="input-group" id="api-key-input-group" style="display: none;">
           <input
             type="password"
@@ -46,11 +57,14 @@
           />
           <button id="save-api-key">Save</button>
         </div>
+        <!-- API Key Status Display -->
         <div id="api-key-status" style="display: none;">
           <span>API Key is set</span>
           <button id="change-api-key" class="link-button">Change API Key</button>
         </div>
       </div>
+
+      <!-- Model Selection Dropdown -->
       <div>
         <label for="model-select">Select Model:</label>
         <select id="model-select">
@@ -60,6 +74,8 @@
           <option value="o1-preview-2024-09-12">o1-preview</option>
         </select>
       </div>
+
+      <!-- Custom Instructions Input -->
       <div>
         <label for="instructions">
           Review Instructions:
@@ -74,17 +90,27 @@
           rows="3"
         ></textarea>
       </div>
+
+      <!-- Status and Control Section -->
       <div id="status" class="warning-status">Please set your OpenAI API key to start reviewing</div>
       <button id="review-button" disabled>Start Review</button>
+
+      <!-- Results Display Section -->
       <div id="results"></div>
       <div id="review-container">
+        <!-- Review Summary Section -->
         <div id="summary">
           <p id="summary-text"></p>
         </div>
+        <!-- Review Comments Section -->
         <div id="comments"></div>
       </div>
     </div>
+
+    <!-- Main Application Script -->
     <script src="popup.js"></script>
   </body>
 </html>
+
+
 
