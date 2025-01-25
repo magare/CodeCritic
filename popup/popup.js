@@ -203,10 +203,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
               *   **Prioritize your feedback**: Focus on major issues (correctness, security, design) first, then address style and minor improvements.
               *   **Maintain a professional and respectful tone.** Remember, your feedback should be constructive and helpful.
-              *   **Remember**: You are an AI assistant, not a replacement for human judgment. Your feedback is intended to be a helpful tool for the developer.
-              *   If you need more information (e.g., context about the project's architecture or requirements), ask clarifying questions in a separate comment.
-              *   **Be ready for follow-up questions**: The developer might ask for clarification or further explanation.
-
+              *   **Prioritize the Additional Instructions** over the general instructions.
+             
             Your feedback for comments should be formatted as a series of individual comments, mimicking how a human reviewer would provide feedback on GitHub. Use the following structure for each comment:
 
                   1.  **File and Location:**
@@ -330,12 +328,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let formattedText = markdownText;
 
-    // Remove the final message about questions and suggestions
-    formattedText = formattedText.replace(
-      /---\s*If you have any questions.*$/,
-      ""
-    );
-
     // Add colored backgrounds for severity levels
     formattedText = formattedText.replace(
       /\[(.*?)\] - (High|Medium|Low)/g,
@@ -374,7 +366,15 @@ document.addEventListener("DOMContentLoaded", function () {
     // Convert code blocks
     formattedText = formattedText.replace(
       /```(\w+)?\n([\s\S]*?)```/gm,
-      '<pre class="result-code-block"><code>$2</code></pre>'
+      (match, language, code) => {
+        // Default to javascript if no language is specified
+        const lang = language || "javascript";
+        // Create a temporary element to safely escape the code
+        const temp = document.createElement("div");
+        temp.textContent = code.trim();
+        const escapedCode = temp.innerHTML;
+        return `<pre class="result-code-block"><code class="language-${lang}">${escapedCode}</code></pre>`;
+      }
     );
 
     // Convert inline code
@@ -410,7 +410,20 @@ document.addEventListener("DOMContentLoaded", function () {
       "</div><br>"
     );
 
-    return `<div class="result-container">${formattedText}</div>`;
+    const container = `<div class="result-container">${formattedText}</div>`;
+
+    // Use setTimeout to ensure the DOM is updated before highlighting
+    setTimeout(() => {
+      // Highlight all code blocks
+      document.querySelectorAll("pre code").forEach((block) => {
+        if (!block.classList.contains("prism-highlighted")) {
+          Prism.highlightElement(block);
+          block.classList.add("prism-highlighted");
+        }
+      });
+    }, 0);
+
+    return container;
   }
 
   // Load settings from storage

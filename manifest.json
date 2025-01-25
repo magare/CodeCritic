@@ -15,5 +15,14 @@
       "matches": ["https://github.com/*/*/pull/*"],
       "js": ["content/content.js"]
     }
-  ]
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["lib/prism/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
 }
