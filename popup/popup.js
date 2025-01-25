@@ -36,16 +36,6 @@ document.addEventListener("DOMContentLoaded", async function () {
   const apiKeyStatus = document.getElementById("api-key-status");
   const changeApiKeyButton = document.getElementById("change-api-key");
 
-  setTimeout(() => {
-    // Highlight all code blocks
-    document.querySelectorAll("pre code").forEach((block) => {
-      if (!block.classList.contains("prism-highlighted")) {
-        Prism.highlightElement(block);
-        block.classList.add("prism-highlighted");
-      }
-    });
-  }, 0);
-
   // Load saved settings and previous review result
   loadSettings();
   loadPreviousReview();
@@ -311,6 +301,30 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Call the OpenAI API with the constructed prompt
     try {
+      const messages = [];
+      let finalPrompt = prompt;
+
+      // Only add system message for GPT models
+      if (selectedModel.startsWith("gpt-")) {
+        messages.push({ role: "system", content: systemPrompt });
+        messages.push({ role: "user", content: prompt });
+      } else {
+        // For O1 models, prepend the system prompt to the user message
+        finalPrompt = `${systemPrompt}\n\n${prompt}`;
+        messages.push({ role: "user", content: finalPrompt });
+      }
+
+      // Prepare request body based on model type
+      const requestBody = {
+        model: selectedModel,
+        messages: messages,
+        // temperature: 0.5,
+      };
+
+      if (selectedModel.startsWith("gpt-")) {
+        requestBody.temperature = 0.5;
+      }
+
       const response = await fetch(
         "https://api.openai.com/v1/chat/completions",
         {
@@ -319,15 +333,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             Authorization: `Bearer ${apiKey}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            model: selectedModel,
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: prompt },
-            ],
-            temperature: 0.5,
-            max_tokens: 1024,
-          }),
+          body: JSON.stringify(requestBody),
         }
       );
       if (!response.ok) {
@@ -511,18 +517,18 @@ document.addEventListener("DOMContentLoaded", async function () {
       function (data) {
         if (data.apiKey) {
           apiKeyInput.value = data.apiKey;
-          // Hide input group and show status
           apiKeyInputGroup.style.display = "none";
           apiKeyStatus.style.display = "block";
         } else {
-          // Show input group and hide status
           apiKeyInputGroup.style.display = "flex";
           apiKeyStatus.style.display = "none";
         }
 
+        // Set the selected model if it exists in storage
         if (data.selectedModel) {
           modelSelect.value = data.selectedModel;
         }
+
         if (data.instructions) {
           instructionsInput.value = data.instructions;
         }
@@ -530,20 +536,31 @@ document.addEventListener("DOMContentLoaded", async function () {
     );
   }
 
+  // Add event listener for model selection change
+  modelSelect.addEventListener("change", function () {
+    chrome.storage.sync.set({ selectedModel: modelSelect.value });
+  });
+
   // Add this new function to load previous review
   async function loadPreviousReview() {
     const data = await chrome.storage.local.get("lastReviewResult");
     if (data.lastReviewResult) {
       const { summary, prTitle, timestamp } = data.lastReviewResult;
 
-      // Show the last review timestamp
-      const reviewTime = new Date(timestamp).toLocaleString();
-      statusDiv.textContent = `Last review for PR: ${prTitle} (${reviewTime})`;
+      // Only show the last review if we have all required information
+      if (summary && prTitle && timestamp) {
+        // Show the last review timestamp in a more readable format
+        const reviewTime = new Date(timestamp).toLocaleString();
+        statusDiv.textContent = `Last review for "${prTitle}" (${reviewTime})`;
 
-      // Display the results
-      console.log("resultsDiv", resultsDiv);
-      if (resultsDiv) {
-        resultsDiv.innerHTML = formatReviewResults(summary);
+        // Display the results
+        if (resultsDiv) {
+          resultsDiv.innerHTML = formatReviewResults(summary);
+        }
+      } else {
+        // Clear the previous review if data is incomplete
+        statusDiv.textContent = "Ready to review";
+        resultsDiv.innerHTML = "";
       }
     }
   }

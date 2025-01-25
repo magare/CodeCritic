@@ -37,10 +37,28 @@
         --color-fg-muted: #57606a;
         --color-accent-fg: #0969da;
         --color-accent-emphasis: #0969da;
-        --color-success-fg: #1a7f37;
+        --color-success-fg: #2da44e;
         --color-danger-fg: #cf222e;
         --color-neutral-muted: #afb8c1;
         --color-neutral-subtle: #f6f8fa;
+        --color-btn-text: #24292f;
+        --color-btn-bg: #f6f8fa;
+        --color-btn-border: rgba(27,31,36,0.15);
+        --color-btn-shadow: 0 1px 0 rgba(27,31,36,0.04);
+        --color-btn-inset-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+        --color-btn-hover-bg: #f3f4f6;
+        --color-btn-hover-border: rgba(27,31,36,0.15);
+        --color-btn-active-bg: #ebecf0;
+        --color-btn-active-border: rgba(27,31,36,0.15);
+        --color-btn-primary-text: #ffffff;
+        --color-btn-primary-bg: #2da44e;
+        --color-btn-primary-border: rgba(27,31,36,0.15);
+        --color-btn-primary-shadow: 0 1px 0 rgba(27,31,36,0.1);
+        --color-btn-primary-hover-bg: #2c974b;
+        --color-btn-primary-hover-border: rgba(27,31,36,0.15);
+        --color-btn-primary-disabled-text: rgba(255,255,255,0.8);
+        --color-btn-primary-disabled-bg: #94d3a2;
+        --color-btn-primary-disabled-border: rgba(27,31,36,0.15);
       }
 
       body {
@@ -56,7 +74,7 @@
         background-color: var(--color-canvas-default);
         border: 1px solid var(--color-border-default);
         border-radius: 6px;
-        padding: 16px;
+        padding: 24px;
         margin: 16px;
       }
 
@@ -67,7 +85,7 @@
       }
 
       h1 {
-        font-size: 20px;
+        font-size: 24px;
         padding-bottom: 8px;
         border-bottom: 1px solid var(--color-border-default);
       }
@@ -93,41 +111,54 @@
         width: 100%;
         padding: 5px 12px;
         margin-bottom: 16px;
-        background-color: var(--color-canvas-subtle);
+        background-color: var(--color-canvas-default);
         border: 1px solid var(--color-border-default);
         border-radius: 6px;
         box-sizing: border-box;
         font-size: 14px;
         line-height: 20px;
+        color: var(--color-fg-default);
       }
 
       input[type="password"]:focus,
       select:focus,
       textarea:focus {
         outline: none;
-        border-color: var(--color-accent-emphasis);
+        border-color: var(--color-accent-fg);
         box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.3);
       }
 
       button {
-        background-color: var(--color-success-fg);
-        color: var(--color-canvas-default);
-        border: 1px solid rgba(27, 31, 36, 0.15);
+        color: var(--color-btn-text);
+        background-color: var(--color-btn-bg);
+        border: 1px solid var(--color-btn-border);
+        box-shadow: var(--color-btn-shadow), var(--color-btn-inset-shadow);
         padding: 5px 16px;
         border-radius: 6px;
         cursor: pointer;
         font-size: 14px;
         font-weight: 500;
         line-height: 20px;
-        transition: background-color 0.2s;
+        transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+        transition-property: color, background-color, border-color;
       }
 
-      button:hover {
-        background-color: #1f883d;
+      button:hover:not(:disabled) {
+        background-color: var(--color-btn-hover-bg);
+        border-color: var(--color-btn-hover-border);
+        transition-duration: 0.1s;
+      }
+
+      button:active {
+        background-color: var(--color-btn-active-bg);
+        border-color: var(--color-btn-active-border);
+        transition: none;
       }
 
       button:disabled {
-        background-color: var(--color-neutral-muted);
+        color: var(--color-neutral-muted);
+        background-color: var(--color-btn-bg);
+        border-color: var(--color-btn-border);
         cursor: not-allowed;
       }
 
@@ -204,7 +235,7 @@
         font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
           Liberation Mono, monospace;
         font-size: 12px;
-        line-height: 1.5;
+        line-height: 1.45;
         background-color: #0d1117;
         border: 1px solid var(--color-border-default);
         border-radius: 6px;
@@ -214,6 +245,7 @@
         max-height: 400px;
         white-space: pre !important;
         tab-size: 2;
+        color: #e6edf3;
       }
 
       pre.result-code-block code {
@@ -300,7 +332,7 @@
       /* Review item styles */
       .review-item {
         margin-bottom: 16px;
-        padding: 12px;
+        padding: 16px;
         border: 1px solid var(--color-border-default);
         border-radius: 6px;
         background-color: var(--color-canvas-subtle);
@@ -309,7 +341,7 @@
       .file-path {
         color: var(--color-accent-fg);
         font-weight: 600;
-        margin-bottom: 4px;
+        margin-bottom: 8px;
       }
 
       .line-info {
@@ -319,28 +351,34 @@
       }
 
       /* Severity level styles */
+      .severity-high,
+      .severity-medium,
+      .severity-low {
+        display: inline-block;
+        padding: 0 7px;
+        font-size: 12px;
+        font-weight: 500;
+        line-height: 18px;
+        border: 1px solid transparent;
+        border-radius: 2em;
+      }
+
       .severity-high {
-        background-color: #ffebe9;
-        color: var(--color-danger-fg);
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: 600;
+        color: #cf222e;
+        background-color: #FFEBE9;
+        border-color: rgba(255,129,130,0.4);
       }
 
       .severity-medium {
-        background-color: #fff8c5;
         color: #9a6700;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: 600;
+        background-color: #FFF8C5;
+        border-color: rgba(212,167,44,0.4);
       }
 
       .severity-low {
-        background-color: #ddf4ff;
         color: #0969da;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: 600;
+        background-color: #DDFBE6;
+        border-color: rgba(74,194,107,0.4);
       }
 
       .comment-header .file {
@@ -377,6 +415,36 @@
         font-style: normal;
         font-weight: 500;
       }
+
+      #review-button {
+        color: var(--color-btn-primary-text);
+        background-color: var(--color-btn-primary-bg);
+        border-color: var(--color-btn-primary-border);
+        box-shadow: var(--color-btn-primary-shadow), var(--color-btn-inset-shadow);
+      }
+
+      #review-button:hover:not(:disabled) {
+        background-color: var(--color-btn-primary-hover-bg);
+        border-color: var(--color-btn-primary-hover-border);
+      }
+
+      #review-button:disabled {
+        color: var(--color-btn-primary-disabled-text);
+        background-color: var(--color-btn-primary-disabled-bg);
+        border-color: var(--color-btn-primary-disabled-border);
+      }
+
+      #save-api-key {
+        color: var(--color-btn-primary-text);
+        background-color: var(--color-btn-primary-bg);
+        border-color: var(--color-btn-primary-border);
+        box-shadow: var(--color-btn-primary-shadow), var(--color-btn-inset-shadow);
+      }
+
+      #save-api-key:hover:not(:disabled) {
+        background-color: var(--color-btn-primary-hover-bg);
+        border-color: var(--color-btn-primary-hover-border);
+      }
     </style>
   </head>
   <body>
@@ -401,8 +469,8 @@
         <select id="model-select">
           <option value="gpt-4o-mini">gpt-4o-mini</option>
           <option value="gpt-4o">gpt-4o</option>
-          <option value="o1-mini">o1-mini</option>
-          <option value="o1">o1</option>
+          <option value="o1-mini-2024-09-12">o1-mini</option>
+          <option value="o1-preview-2024-09-12">o1-preview</option>
         </select>
       </div>
       <div>
