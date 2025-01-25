@@ -371,6 +371,12 @@
         background-color: var(--color-border-default);
         margin: 16px 0;
       }
+
+      #status.warning-status {
+        color: var(--color-danger-fg);
+        font-style: normal;
+        font-weight: 500;
+      }
     </style>
   </head>
   <body>
@@ -413,8 +419,8 @@
           rows="3"
         ></textarea>
       </div>
-      <div id="status">Ready to review</div>
-      <button id="review-button">Start Review</button>
+      <div id="status" class="warning-status">Please set your OpenAI API key to start reviewing</div>
+      <button id="review-button" disabled>Start Review</button>
       <div id="results"></div>
       <div id="review-container">
         <div id="summary">

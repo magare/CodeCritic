@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
   // Initialize highlight.js
   hljs.configure({
     ignoreUnescapedHTML: true,
@@ -50,38 +50,74 @@ document.addEventListener("DOMContentLoaded", function () {
   loadSettings();
   loadPreviousReview();
 
-  // Save API key, model, and instructions
-  saveApiKeyButton.addEventListener("click", function () {
-    const apiKey = apiKeyInput.value;
-    const selectedModel = modelSelect.value;
-    const instructions = instructionsInput.value;
+  // Initially disable the review button until we check both conditions
+  reviewButton.disabled = true;
+  statusDiv.classList.add("warning-status");
+  statusDiv.textContent = "Please set your OpenAI API key to start reviewing";
 
-    if (!apiKey) {
-      statusDiv.textContent = "Please enter your OpenAI API key.";
-      return;
-    }
+  // Get stored API key on load
+  chrome.storage.local.get(["apiKey"], function (result) {
+    const hasApiKey = !!result.apiKey;
 
-    chrome.storage.sync.set(
-      { apiKey, selectedModel, instructions },
-      function () {
-        statusDiv.textContent = "Settings saved!";
-        // Hide input group and show status
-        apiKeyInputGroup.style.display = "none";
-        apiKeyStatus.style.display = "block";
-      }
-    );
-  });
+    if (hasApiKey) {
+      apiKeyInputGroup.style.display = "none";
+      apiKeyStatus.style.display = "block";
 
-  // Check if we're on a GitHub PR page
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    const currentTab = tabs[0];
-    if (currentTab && currentTab.url.match(/github\.com\/.*\/.*\/pull\/.*/)) {
-      reviewButton.disabled = false;
-      statusDiv.textContent = "Ready to review PR";
+      // Only check GitHub PR page if we have an API key
+      checkGitHubPRPage();
     } else {
-      statusDiv.textContent = "Not a GitHub PR page";
+      apiKeyInputGroup.style.display = "flex";
+      apiKeyStatus.style.display = "none";
+      reviewButton.disabled = true;
+      statusDiv.textContent =
+        "Please set your OpenAI API key to start reviewing";
+      statusDiv.classList.add("warning-status");
     }
   });
+
+  // Function to check if we're on a GitHub PR page
+  function checkGitHubPRPage() {
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      const currentTab = tabs[0];
+      if (currentTab && currentTab.url.match(/github\.com\/.*\/.*\/pull\/.*/)) {
+        reviewButton.disabled = false;
+        statusDiv.textContent = "Ready to review PR";
+        statusDiv.classList.remove("warning-status");
+      } else {
+        reviewButton.disabled = true;
+        statusDiv.textContent = "Not a GitHub PR page";
+        statusDiv.classList.add("warning-status");
+      }
+    });
+  }
+
+  // Handle saving API key
+  document
+    .getElementById("save-api-key")
+    .addEventListener("click", function () {
+      const apiKey = document.getElementById("api-key").value.trim();
+      if (apiKey) {
+        chrome.storage.local.set({ apiKey: apiKey }, function () {
+          apiKeyInputGroup.style.display = "none";
+          apiKeyStatus.style.display = "block";
+          // After saving API key, check GitHub PR page status
+          checkGitHubPRPage();
+        });
+      }
+    });
+
+  // Handle changing API key
+  document
+    .getElementById("change-api-key")
+    .addEventListener("click", function () {
+      apiKeyInputGroup.style.display = "flex";
+      apiKeyStatus.style.display = "none";
+      reviewButton.disabled = true;
+      statusDiv.textContent =
+        "Please set your OpenAI API key to start reviewing";
+      statusDiv.classList.add("warning-status");
+      chrome.storage.local.remove("apiKey");
+    });
 
   reviewButton.addEventListener("click", async function () {
     // Disable the review button
@@ -511,10 +547,4 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
   }
-
-  // Add change API key button handler
-  changeApiKeyButton.addEventListener("click", function () {
-    apiKeyInputGroup.style.display = "flex";
-    apiKeyStatus.style.display = "none";
-  });
 });
