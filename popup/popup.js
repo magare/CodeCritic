@@ -544,24 +544,41 @@ document.addEventListener("DOMContentLoaded", async function () {
   // Add this new function to load previous review
   async function loadPreviousReview() {
     const data = await chrome.storage.local.get("lastReviewResult");
+    const summaryTitleDiv = document.getElementById("summary-title");
+
     if (data.lastReviewResult) {
       const { summary, prTitle, timestamp } = data.lastReviewResult;
 
       // Only show the last review if we have all required information
       if (summary && prTitle && timestamp) {
         // Show the last review timestamp in a more readable format
-        const reviewTime = new Date(timestamp).toLocaleString();
-        statusDiv.textContent = `Last review for "${prTitle}" (${reviewTime})`;
+        const reviewTime = new Date(timestamp).toLocaleString(undefined, {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true,
+        });
+
+        // Update the summary title with PR title and timestamp
+        summaryTitleDiv.innerHTML = `<h2>Review for: ${prTitle}</h2><p class="review-timestamp">Reviewed on: ${reviewTime}</p>`;
 
         // Display the results
         if (resultsDiv) {
           resultsDiv.innerHTML = formatReviewResults(summary);
         }
       } else {
-        // Clear the previous review if data is incomplete
+        // Show default title if data is incomplete
+        summaryTitleDiv.innerHTML = `<h2>No Previous Review</h2>`;
         statusDiv.textContent = "Ready to review";
         resultsDiv.innerHTML = "";
       }
+    } else {
+      // Show default title if no previous review exists
+      summaryTitleDiv.innerHTML = `<h2>No Previous Review</h2>`;
+      statusDiv.textContent = "Ready to review";
+      resultsDiv.innerHTML = "";
     }
   }
 });
