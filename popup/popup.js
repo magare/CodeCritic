@@ -48,48 +48,59 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   reviewButton.addEventListener("click", async function () {
-    // Get the current tab to get PR title
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      currentWindow: true,
-    });
-    const tabId = tab.id;
+    // Disable the review button
+    reviewButton.disabled = true;
+    reviewButton.textContent = "Reviewing...";
 
-    // Execute script to get PR title
-    const [{ result: prTitle }] = await chrome.scripting.executeScript({
-      target: { tabId },
-      function: () => {
-        const titleElement = document.querySelector(
-          ".gh-header-title .js-issue-title"
-        );
-        return titleElement ? titleElement.innerText : "Unknown PR";
-      },
-    });
-
-    statusDiv.textContent = `Reviewing PR: ${prTitle}...`;
-    console.log("resultsDiv", resultsDiv);
-    resultsDiv.innerHTML = ""; // Clear previous results
-
-    // Get the current values from inputs instead of storage
-    const apiKey = apiKeyInput.value;
-    const selectedModel = modelSelect.value;
-    const instructions = instructionsInput.value; // Get directly from input
-
-    console.log("Sending instructions:", instructions); // Add this line
-
-    if (!apiKey) {
-      statusDiv.textContent = "Please enter your OpenAI API key.";
-      return;
-    }
-
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-      const tabId = tabs[0].id;
-      chrome.scripting.executeScript({
-        target: { tabId: tabId },
-        function: triggerReview,
-        args: [apiKey, selectedModel, instructions],
+    try {
+      // Get the current tab to get PR title
+      const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
       });
-    });
+      const tabId = tab.id;
+
+      // Execute script to get PR title
+      const [{ result: prTitle }] = await chrome.scripting.executeScript({
+        target: { tabId },
+        function: () => {
+          const titleElement = document.querySelector(
+            ".gh-header-title .js-issue-title"
+          );
+          return titleElement ? titleElement.innerText : "Unknown PR";
+        },
+      });
+
+      statusDiv.textContent = `Reviewing PR: ${prTitle}...`;
+      resultsDiv.innerHTML = ""; // Clear previous results
+
+      // Save current settings
+      const apiKey = apiKeyInput.value;
+      const selectedModel = modelSelect.value;
+      const instructions = instructionsInput.value;
+
+      // Save all settings including instructions
+      chrome.storage.sync.set({ apiKey, selectedModel, instructions });
+
+      if (!apiKey) {
+        statusDiv.textContent = "Please enter your OpenAI API key.";
+        return;
+      }
+
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        const tabId = tabs[0].id;
+        chrome.scripting.executeScript({
+          target: { tabId: tabId },
+          function: triggerReview,
+          args: [apiKey, selectedModel, instructions],
+        });
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      statusDiv.textContent = `Error: ${error.message}`;
+      reviewButton.disabled = false;
+      reviewButton.textContent = "Start Review";
+    }
   });
 
   async function triggerReview(apiKey, selectedModel, customInstructions) {
@@ -298,6 +309,10 @@ document.addEventListener("DOMContentLoaded", function () {
   ) {
     console.log("Received message:", request); // Debug log
     if (request.type === "review-results") {
+      // Re-enable the review button
+      reviewButton.disabled = false;
+      reviewButton.textContent = "Start Review";
+
       if (request.data.error) {
         statusDiv.textContent = `Error reviewing PR: ${request.data.error}`;
         resultsDiv.innerHTML = "";
@@ -345,10 +360,15 @@ document.addEventListener("DOMContentLoaded", function () {
       '<h3 class="result-subheading">$1</h3>'
     );
 
-    // Convert numbered lists with file paths
+    // Convert numbered lists with file paths - only show if both file path and line info exist
     formattedText = formattedText.replace(
-      /^\d+\.\s+File:\s+(.*?)(\s+\(Line:.*?\))/gim,
-      '<div class="review-item"><div class="file-path">$1</div><div class="line-info">$2</div>'
+      /^\d+\.\s+(?:File:\s+(.*?)(\s+\(Line:.*?\)))?/gim,
+      (match, filePath, lineInfo) => {
+        if (filePath && lineInfo) {
+          return `<div class="review-item"><div class="file-path">${filePath}</div><div class="line-info">${lineInfo}</div>`;
+        }
+        return '<div class="review-item">';
+      }
     );
 
     // Convert code blocks
@@ -373,6 +393,12 @@ document.addEventListener("DOMContentLoaded", function () {
     formattedText = formattedText.replace(
       /\*(.*?)\*/g,
       '<em class="result-italic">$1</em>'
+    );
+
+    // Replace horizontal separators
+    formattedText = formattedText.replace(
+      /---+/g,
+      '<hr class="review-separator">'
     );
 
     // Replace newlines with <br> tags
