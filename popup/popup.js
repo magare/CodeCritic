@@ -1,4 +1,30 @@
 document.addEventListener("DOMContentLoaded", function () {
+  // Initialize highlight.js
+  hljs.configure({
+    ignoreUnescapedHTML: true,
+    languages: [
+      "javascript",
+      "typescript",
+      "python",
+      "java",
+      "go",
+      "ruby",
+      "xml",
+      "css",
+      "c",
+      "cpp",
+      "csharp",
+      "rust",
+      "swift",
+      "kotlin",
+      "sql",
+      "bash",
+      "yaml",
+      "json",
+      "php",
+    ],
+  });
+
   const apiKeyInput = document.getElementById("api-key");
   const saveApiKeyButton = document.getElementById("save-api-key");
   const modelSelect = document.getElementById("model-select");
@@ -9,6 +35,16 @@ document.addEventListener("DOMContentLoaded", function () {
   const apiKeyInputGroup = document.getElementById("api-key-input-group");
   const apiKeyStatus = document.getElementById("api-key-status");
   const changeApiKeyButton = document.getElementById("change-api-key");
+
+  setTimeout(() => {
+    // Highlight all code blocks
+    document.querySelectorAll("pre code").forEach((block) => {
+      if (!block.classList.contains("prism-highlighted")) {
+        Prism.highlightElement(block);
+        block.classList.add("prism-highlighted");
+      }
+    });
+  }, 0);
 
   // Load saved settings and previous review result
   loadSettings();
@@ -414,16 +450,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Use setTimeout to ensure the DOM is updated before highlighting
     setTimeout(() => {
-      // Highlight all code blocks
-      document.querySelectorAll("pre code").forEach((block) => {
-        if (!block.classList.contains("prism-highlighted")) {
-          Prism.highlightElement(block);
-          block.classList.add("prism-highlighted");
-        }
-      });
+      highlightCode();
     }, 0);
 
     return container;
+  }
+
+  // Function to highlight code blocks
+  function highlightCode() {
+    document.querySelectorAll("pre code").forEach((block) => {
+      if (!block.classList.contains("hljs")) {
+        hljs.highlightElement(block);
+      }
+    });
   }
 
   // Load settings from storage

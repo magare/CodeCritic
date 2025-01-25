@@ -18,7 +18,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["lib/prism/*"],
+      "resources": ["lib/highlight/*"],
       "matches": ["<all_urls>"]
     }
   ],
