@@ -35,10 +35,27 @@ document.addEventListener("DOMContentLoaded", async function () {
   const apiKeyInputGroup = document.getElementById("api-key-input-group");
   const apiKeyStatus = document.getElementById("api-key-status");
   const changeApiKeyButton = document.getElementById("change-api-key");
+  const container = document.querySelector(".container");
 
   // Load saved settings and previous review result
   loadSettings();
   loadPreviousReview();
+
+  // Restore scroll position
+  restoreScrollPosition();
+
+  // Save scroll position when scrolling
+  container.addEventListener("scroll", () => {
+    chrome.storage.local.set({ scrollPosition: container.scrollTop });
+  });
+
+  // Function to restore scroll position
+  async function restoreScrollPosition() {
+    const data = await chrome.storage.local.get("scrollPosition");
+    if (data.scrollPosition) {
+      container.scrollTop = data.scrollPosition;
+    }
+  }
 
   // Initially disable the review button until we check both conditions
   reviewButton.disabled = true;

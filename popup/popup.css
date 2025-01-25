@@ -37,8 +37,10 @@ body {
     Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   margin: 0; /* Remove default margin */
   width: 600px;
+  height: 575px; /* Set a fixed height */
   background-color: var(--color-canvas-subtle); /* Set background color */
   color: var(--color-fg-default); /* Set text color */
+  overflow: hidden; /* Prevent body scrolling */
 }
 
 .container {
@@ -48,6 +50,9 @@ body {
   border-radius: 6px; /* Rounded corners */
   padding: 12px; /* Padding inside container */
   margin: 4px; /* Margin around container */
+  height: calc(100% - 10px); /* Full height minus margins */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Hide horizontal scrolling */
 }
 
 .header {
