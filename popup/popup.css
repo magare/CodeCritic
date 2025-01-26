@@ -494,18 +494,35 @@ pre.result-code-block code {
   font-weight: 500; /* Font weight */
 }
 
+/* Review Timestamp Styles */
+.review-timestamp {
+    margin: 5px 0 0 0; /* Margin above */
+    font-size: 0.9em; /* Font size */
+    color: var(--color-fg-muted); /* Muted text color */
+}
+
+/* Summary Title Styles */
 #summary-title {
-    margin: 15px 0 0 0;
+    margin: 15px 0 0 0; /* Margin above */
 }
 
 #summary-title h2 {
-    margin: 0;
-    font-size: 1.2em;
-    color: var(--color-accent-fg);
+    margin: 0; /* Remove margin */
+    font-size: 1.2em; /* Font size */
+    color: var(--color-accent-fg); /* Accent text color */
 }
 
-.review-timestamp {
-    margin: 5px 0 0 0;
-    font-size: 0.9em;
-    color: var(--color-fg-muted);
+/* Warning Status Styles */
+#status.warning-status {
+    color: var(--color-danger-fg); /* Danger text color */
+    font-style: normal; /* Normal font style */
+    font-weight: 500; /* Font weight */
+}
+
+/* Review Separator Styles */
+.review-separator {
+    border: 0; /* No border */
+    height: 1px; /* Height of separator */
+    background-color: var(--color-border-default); /* Background color */
+    margin: 16px 0; /* Margin above and below */
 }

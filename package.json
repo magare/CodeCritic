@@ -1,0 +1,31 @@
+{
+  "name": "codecritic",
+  "version": "1.0.0",
+  "description": "An extension to help review GitHub Pull Requests.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "clean": "rm -rf build",
+    "build:html": "html-minifier --collapse-whitespace --remove-comments --remove-optional-tags --remove-redundant-attributes --remove-script-type-attributes --remove-tag-whitespace --use-short-doctype --minify-css true --minify-js true popup/popup.html -o build/popup/popup.html",
+    "build:js": "terser popup/popup.js -o build/popup/popup.js",
+    "build:assets": "cp -r icons lib manifest.json build && cp popup/popup.css build/popup/popup.css && cleancss -o build/popup/popup.min.css build/popup/popup.css && mv build/popup/popup.min.css build/popup/popup.css",
+    "build": "npm run clean && mkdir -p build/popup && npm run build:html && npm run build:js && npm run build:assets",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/magare/CodeCritic.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/magare/CodeCritic/issues"
+  },
+  "homepage": "https://github.com/magare/CodeCritic#readme",
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3",
+    "terser": "^5.37.0"
+  }
+}
