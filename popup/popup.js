@@ -591,7 +591,13 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     let formattedText = markdownText;
 
-    // Add colored backgrounds for severity levels
+    // Style file names with a distinctive look
+    formattedText = formattedText.replace(
+      /File Name: ([^\n]+)/g,
+      '<div class="file-name-header">$1</div>'
+    );
+
+    // Add colored backgrounds for severity levels with improved styling
     formattedText = formattedText.replace(
       /\[(.*?)\] - (High|Medium|Low)/g,
       (match, category, severity) => {
@@ -601,7 +607,20 @@ document.addEventListener("DOMContentLoaded", async function () {
           Low: "severity-low",
         }[severity];
 
-        return `[${category}] - <span class="${severityClass}">${severity}</span>`;
+        return `<div class="severity-container"><span class="category-label">[${category}]</span> - <span class="${severityClass}">${severity}</span></div>`;
+      }
+    );
+
+    // Convert code blocks - Updated to better handle code blocks
+    formattedText = formattedText.replace(
+      /```([\w-]*)\n([\s\S]*?)```/g,
+      (match, language, code) => {
+        const lang = language || "javascript";
+        const temp = document.createElement("div");
+        temp.textContent = code.trim();
+        const escapedCode = temp.innerHTML;
+        console.log("Processing code block:", { language, code: code.trim() }); // Debug log
+        return `<pre class="result-code-block"><code class="language-${lang}">${escapedCode}</code></pre>`;
       }
     );
 
@@ -619,21 +638,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     formattedText = formattedText.replace(
       /^\d+\.\s+/gim,
       '<div class="review-item">'
-    );
-
-    // Convert code blocks
-    formattedText = formattedText.replace(
-      /```(\w+)?\n([\s\S]*?)```/gm,
-      (match, language, code) => {
-        const lang = language || "javascript";
-        const temp = document.createElement("div");
-        temp.textContent = code.trim();
-        const escapedCode = temp.innerHTML;
-        const cleanCode = escapedCode
-          .replace(/<br\s*\/?>/g, "\n")
-          .replace(/&nbsp;/g, " ");
-        return `<pre class="result-code-block"><code class="language-${lang}">${cleanCode}</code></pre>`;
-      }
     );
 
     // Convert inline code
@@ -654,12 +658,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Replace horizontal separators
     formattedText = formattedText.replace(/---+/g, "<hr>");
 
-    // Replace newlines with <br> tags AFTER code block conversion
-    // But NOT inside pre tags, and handle multiple newlines
+    // Handle newlines more carefully
     formattedText = formattedText.replace(
       /(<pre.*?>[\s\S]*?<\/pre>)|(\n\n+)|(\n)(?!<hr>)/g,
       (match, pre, doubleNewline, singleNewline) => {
-        if (pre) return pre;
+        if (pre) return pre; // Don't modify content inside <pre> tags
         if (doubleNewline) return "<br>";
         if (singleNewline) return "";
       }
@@ -676,14 +679,17 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const container = `<div class="result-container">${formattedText}</div>`;
 
-    // Use setTimeout to ensure the DOM is updated before highlighting
+    // Add debug logging for highlight.js
     setTimeout(() => {
-      document.querySelectorAll("pre code").forEach((block) => {
+      const codeBlocks = document.querySelectorAll("pre code");
+      console.log("Found code blocks:", codeBlocks.length); // Debug log
+      codeBlocks.forEach((block) => {
         if (!block.classList.contains("hljs")) {
+          console.log("Highlighting block:", block.className); // Debug log
           hljs.highlightElement(block);
         }
       });
-    }, 0);
+    }, 100);
 
     return container;
   }

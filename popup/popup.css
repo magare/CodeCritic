@@ -7,7 +7,7 @@
   --color-fg-muted: #57606a; /* Muted foreground color */
   --color-accent-fg: #0969da; /* Accent foreground color */
   --color-accent-emphasis: #0969da; /* Emphasis accent color */
-  --color-success-fg: #2da44e; /* Success foreground color */
+  --color-success-fg: #1a7f37; /* Success foreground color */
   --color-danger-fg: #cf222e; /* Danger foreground color */
   --color-neutral-muted: #afb8c1; /* Muted neutral color */
   --color-neutral-subtle: #f6f8fa; /* Subtle neutral color */
@@ -29,6 +29,11 @@
   --color-btn-primary-disabled-text: rgba(255, 255, 255, 0.8); /* Disabled primary button text color */
   --color-btn-primary-disabled-bg: #94d3a2; /* Disabled primary button background color */
   --color-btn-primary-disabled-border: rgba(27, 31, 36, 0.15); /* Disabled primary button border color */
+  --color-header-bg: #24292f;
+  --color-header-text: #ffffff;
+  --color-scale-gray-100: #f6f8fa;
+  --color-scale-gray-200: #eaeef2;
+  --color-scale-blue-100: #ddf4ff;
 }
 
 body {
@@ -281,35 +286,42 @@ button:disabled {
 /* Code block styling */
 pre.result-code-block {
   /* Code Block Styles */
-  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-    Liberation Mono, monospace; /* Monospace font */
-  font-size: 12px; /* Font size */
-  line-height: 1.45; /* Line height */
-  background-color: #0d1117; /* Background color */
-  border: 1px solid var(--color-border-default); /* Border */
-  border-radius: 6px; /* Rounded corners */
-  padding: 16px; /* Padding inside */
-  margin: 8px 0; /* Margin above and below */
-  overflow-x: auto; /* Horizontal overflow */
-  max-height: 400px; /* Max height */
-  white-space: pre !important; /* Preserve whitespace */
-  tab-size: 2; /* Tab size */
-  color: #e6edf3; /* Text color */
+  background-color: var(--color-canvas-subtle);
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  padding: 16px;
+  margin: 8px 0;
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--color-fg-default);
+  overflow-x: auto;
+  max-height: 400px;
+  white-space: pre;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 pre.result-code-block code {
   /* Code Styles within Code Block */
-  background: none; /* No background */
-  padding: 0; /* No padding */
-  margin: 0; /* No margin */
-  font-size: inherit; /* Inherit font size */
-  font-family: inherit; /* Inherit font family */
-  line-height: inherit; /* Inherit line height */
-  white-space: pre !important; /* Preserve whitespace */
-  display: block; /* Block display */
-  color: #e6edf3; /* Text color */
-  overflow-x: visible; /* Visible overflow */
-  word-wrap: normal; /* Normal word wrap */
+  display: block;
+  overflow-x: auto;
+  padding: 0;
+  margin: 0;
+  font-size: inherit;
+  font-family: inherit;
+  line-height: inherit;
+  white-space: pre;
+  background: none;
+  border: 0;
+  color: inherit;
+}
+
+/* Ensure code blocks are properly contained */
+.result-container pre {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 /* Override highlight.js styles */
@@ -326,9 +338,10 @@ pre.result-code-block code {
   font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
     Liberation Mono, monospace; /* Monospace font */
   font-size: 85%; /* Smaller font size */
-  background-color: rgba(175, 184, 193, 0.2); /* Background color */
-  border-radius: 4px; /* Rounded corners */
+  background-color: var(--color-canvas-subtle); /* Background color */
+  border-radius: 6px; /* Rounded corners */
   padding: 0.2em 0.4em; /* Padding */
+  border: 1px solid var(--color-border-default); /* Border */
 }
 
 .tooltip {
@@ -391,7 +404,7 @@ pre.result-code-block code {
   padding: 16px; /* Padding inside */
   border: 1px solid var(--color-border-default); /* Border */
   border-radius: 6px; /* Rounded corners */
-  background-color: var(--color-canvas-subtle); /* Background color */
+  background-color: var(--color-canvas-default); /* Background color */
 }
 
 .file-path {
@@ -414,30 +427,31 @@ pre.result-code-block code {
 .severity-low {
   /* Severity Level Styles */
   display: inline-block; /* Inline block display */
-  padding: 0 7px; /* Padding */
+  padding: 2px 8px; /* Padding */
   font-size: 12px; /* Font size */
   font-weight: 500; /* Font weight */
   line-height: 18px; /* Line height */
   border: 1px solid transparent; /* Transparent border */
-  border-radius: 2em; /* Rounded corners */
+  border-radius: 12px; /* Rounded corners */
+  margin-left: 4px; /* Margin left */
 }
 
 .severity-high {
   color: #cf222e; /* High severity text color */
   background-color: #ffebe9; /* High severity background color */
-  border-color: rgba(255, 129, 130, 0.4); /* High severity border color */
+  border: 1px solid rgba(255, 129, 130, 0.4); /* High severity border color */
 }
 
 .severity-medium {
   color: #9a6700; /* Medium severity text color */
   background-color: #fff8c5; /* Medium severity background color */
-  border-color: rgba(212, 167, 44, 0.4); /* Medium severity border color */
+  border: 1px solid rgba(212, 167, 44, 0.4); /* Medium severity border color */
 }
 
 .severity-low {
-  color: #0969da; /* Low severity text color */
-  background-color: #ddfbe6; /* Low severity background color */
-  border-color: rgba(74, 194, 107, 0.4); /* Low severity border color */
+  color: #1a7f37; /* Low severity text color */
+  background-color: #ddf4ff; /* Low severity background color */
+  border: 1px solid rgba(74, 194, 107, 0.4); /* Low severity border color */
 }
 
 .comment-header .file {
@@ -484,8 +498,8 @@ pre.result-code-block code {
 .review-separator {
   /* Review Separator Styles */
   border: 0; /* No border */
-  height: 1px; /* Height of separator */
-  background-color: var(--color-border-default); /* Background color */
+  height: 8px; /* Height of separator */
+  background-color: var(--color-canvas-subtle); /* Background color */
   margin: 16px 0; /* Margin above and below */
 }
 
@@ -506,13 +520,16 @@ pre.result-code-block code {
 
 /* Summary Title Styles */
 #summary-title {
-    margin: 15px 0 0 0; /* Margin above */
+    margin: 16px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border-default);
 }
 
 #summary-title h2 {
     margin: 0; /* Remove margin */
-    font-size: 1.5em; /* Increased font size for summary title */
-    color: var(--color-accent-fg); /* Accent text color */
+    font-size: 20px; /* Increased font size for summary title */
+    font-weight: 600; /* Bold font weight */
+    color: var(--color-fg-default); /* Accent text color */
     line-height: 1.4; /* Increased line height for summary title */
 }
 
@@ -526,7 +543,67 @@ pre.result-code-block code {
 /* Review Separator Styles */
 .review-separator {
     border: 0; /* No border */
-    height: 1px; /* Height of separator */
-    background-color: var(--color-border-default); /* Background color */
+    height: 8px; /* Height of separator */
+    background-color: var(--color-canvas-subtle); /* Background color */
     margin: 16px 0; /* Margin above and below */
 }
+
+.file-name-header {
+    /* background-color: var(--color-canvas-subtle); */
+    color: var(--color-fg-default);
+    /* padding: 8px 12px; */
+    margin: 16px 0 8px 0;
+    /* border-radius: 6px; */
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    font-size: 13px;
+    font-weight: 600;
+    /* border: 1px solid var(--color-border-default);
+    border-bottom: none; */
+    display: flex;
+    align-items: center;
+}
+
+.file-name-header::before {
+    content: "📄";
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.severity-container {
+    /* margin: 4px 0 12px 0;
+    padding: 8px 12px;
+    background-color: var(--color-canvas-subtle); */
+    /* border: 1px solid var(--color-border-default); */
+    /* border-radius: 6px; */
+}
+
+.category-label {
+    background-color: var(--color-scale-gray-100);
+    color: var(--color-fg-default);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid var(--color-border-default);
+}
+
+.severity-high {
+    color: #cf222e;
+    background-color: #ffebe9;
+    border: 1px solid rgba(255, 129, 130, 0.4);
+}
+
+.severity-medium {
+    color: #9a6700;
+    background-color: #fff8c5;
+    border: 1px solid rgba(212, 167, 44, 0.4);
+}
+
+.severity-low {
+    color: #1a7f37;
+    background-color: #ddf4ff;
+    border: 1px solid rgba(74, 194, 107, 0.4);
+}
+
+/* ----------- */
+
