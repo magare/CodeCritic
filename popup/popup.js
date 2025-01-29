@@ -603,13 +603,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     formattedText = formattedText.replace(
       /```(\w+)?\n([\s\S]*?)```/gm,
       (match, language, code) => {
-        // Default to javascript if no language is specified
         const lang = language || "javascript";
-        // Create a temporary element to safely escape the code
         const temp = document.createElement("div");
         temp.textContent = code.trim();
         const escapedCode = temp.innerHTML;
-        // Remove any <br> tags and preserve newlines
         const cleanCode = escapedCode
           .replace(/<br\s*\/?>/g, "\n")
           .replace(/&nbsp;/g, " ");
@@ -633,25 +630,26 @@ document.addEventListener("DOMContentLoaded", async function () {
     formattedText = formattedText.replace(/\*(.*?)\*/g, "<em>$1</em>");
 
     // Replace horizontal separators
-    formattedText = formattedText.replace(
-      /---+/g,
-      '<hr class="review-separator">'
-    );
+    formattedText = formattedText.replace(/---+/g, "<hr>");
 
     // Replace newlines with <br> tags AFTER code block conversion
-    // But NOT inside pre tags
+    // But NOT inside pre tags, and handle multiple newlines
     formattedText = formattedText.replace(
-      /(<pre.*?>[\s\S]*?<\/pre>)|(\n)/g,
-      (match, pre, newline) => {
+      /(<pre.*?>[\s\S]*?<\/pre>)|(\n\n+)|(\n)(?!<hr>)/g,
+      (match, pre, doubleNewline, singleNewline) => {
         if (pre) return pre;
-        return newline ? "<br>" : match;
+        if (doubleNewline) return "<br>";
+        if (singleNewline) return "";
       }
     );
 
+    // Remove <br> tags that come right before <hr> tags
+    formattedText = formattedText.replace(/<br>\s*<hr>/g, "<hr>");
+
     // Close the review-item div for each item
     formattedText = formattedText.replace(
-      /<br><br>(?=<div class="review-item">|$)/g,
-      "</div><br>"
+      /<br>(?=<div class="review-item">|$)/g,
+      "</div>"
     );
 
     const container = `<div class="result-container">${formattedText}</div>`;
