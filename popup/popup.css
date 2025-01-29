@@ -41,6 +41,8 @@ body {
   background-color: var(--color-canvas-subtle); /* Set background color */
   color: var(--color-fg-default); /* Set text color */
   overflow: hidden; /* Prevent body scrolling */
+  font-size: 16px; /* Increased base font size */
+  line-height: 1.5; /* Increased line height for better readability */
 }
 
 .container {
@@ -74,18 +76,16 @@ h3 {
   font-weight: 600; /* Bold font weight */
   margin-top: 0; /* Remove top margin */
   margin-bottom: 16px; /* Space below headings */
+  font-size: 20px; /* Increased font size for h2 */
+  line-height: 1.4; /* Increased line height for headings */
 }
 
 h1 {
   margin-right: 10px; /* Space to the right of h1 */
 }
 
-h2 {
-  font-size: 18px; /* Font size for h2 */
-}
-
 h3 {
-  font-size: 16px; /* Font size for h3 */
+  font-size: 18px; /* Increased font size for h3 */
 }
 
 label {
@@ -93,7 +93,8 @@ label {
   display: block; /* Block display */
   margin-bottom: 4px; /* Space below label */
   font-weight: 600; /* Bold font weight */
-  font-size: 14px; /* Font size for labels */
+  font-size: 16px; /* Increased font size for labels */
+  line-height: 1.4; /* Increased line height for labels */
 }
 
 .button {
@@ -111,15 +112,15 @@ label {
 
 #review-button:hover:not(:disabled),
 #save-api-key:hover:not(:disabled) {
-  background-color: var(--color-btn-primary-hover-bg); /* Hover background color */
-  border-color: var(--color-btn-primary-hover-border); /* Hover border color */
+  background-color: var(--color-btn-primary-hover-bg); /* Primary button hover background color */
+  border-color: var(--color-btn-primary-hover-border); /* Primary button hover border color */
 }
 
 #review-button:disabled,
 #save-api-key:disabled {
-  color: var(--color-btn-primary-disabled-text); /* Disabled text color */
-  background-color: var(--color-btn-primary-disabled-bg); /* Disabled background color */
-  border-color: var(--color-btn-primary-disabled-border); /* Disabled border color */
+  color: var(--color-btn-primary-disabled-text); /* Disabled primary button text color */
+  background-color: var(--color-btn-primary-disabled-bg); /* Disabled primary button background color */
+  border-color: var(--color-btn-primary-disabled-border); /* Disabled primary button border color */
 }
 
 #review-button {
@@ -146,8 +147,8 @@ textarea {
   border: 1px solid var(--color-border-default); /* Input border */
   border-radius: 6px; /* Rounded corners */
   box-sizing: border-box; /* Include padding and border in width */
-  font-size: 14px; /* Font size for inputs */
-  line-height: 20px; /* Line height for inputs */
+  font-size: 16px; /* Increased font size for inputs */
+  line-height: 1.5; /* Increased line height for inputs */
   color: var(--color-fg-default); /* Text color for inputs */
 }
 
@@ -168,9 +169,9 @@ button {
   padding: 5px 16px; /* Padding inside buttons */
   border-radius: 6px; /* Rounded corners */
   cursor: pointer; /* Pointer cursor on hover */
-  font-size: 14px; /* Font size for buttons */
+  font-size: 16px; /* Increased font size for buttons */
   font-weight: 500; /* Font weight for buttons */
-  line-height: 20px; /* Line height for buttons */
+  line-height: 1.5; /* Increased line height for buttons */
   transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1); /* Transition for hover effects */
   transition-property: color, background-color, border-color; /* Properties to transition */
 }
@@ -199,7 +200,8 @@ button:disabled {
   margin-bottom: 16px; /* Space below status */
   font-style: italic; /* Italic font style */
   color: var(--color-fg-muted); /* Muted text color */
-  font-size: 14px; /* Font size for status */
+  font-size: 16px; /* Increased font size for status */
+  line-height: 1.4; /* Increased line height for status */
 }
 
 #results,
@@ -497,8 +499,9 @@ pre.result-code-block code {
 /* Review Timestamp Styles */
 .review-timestamp {
     margin: 5px 0 0 0; /* Margin above */
-    font-size: 0.9em; /* Font size */
+    font-size: 1em; /* Increased font size for review timestamp */
     color: var(--color-fg-muted); /* Muted text color */
+    line-height: 1.4; /* Increased line height for review timestamp */
 }
 
 /* Summary Title Styles */
@@ -508,8 +511,9 @@ pre.result-code-block code {
 
 #summary-title h2 {
     margin: 0; /* Remove margin */
-    font-size: 1.2em; /* Font size */
+    font-size: 1.5em; /* Increased font size for summary title */
     color: var(--color-accent-fg); /* Accent text color */
+    line-height: 1.4; /* Increased line height for summary title */
 }
 
 /* Warning Status Styles */
