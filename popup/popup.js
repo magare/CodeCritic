@@ -229,25 +229,43 @@ document.addEventListener("DOMContentLoaded", async function () {
    */
   async function triggerReview(apiKey, selectedModel, customInstructions) {
     /**
-     * Extract code changes from the PR diff
-     * @returns {string} Formatted string of code changes
+     * Extract code changes from the PR diff with file names
+     * @returns {string} Formatted string of code changes with file names
      */
     function getCodeChanges() {
-      const fileDiffs = document.querySelectorAll(".diff-table tr");
+      const fileBlocks = document.querySelectorAll(".file");
       let codeChanges = "";
 
-      for (const row of fileDiffs) {
-        if (row.querySelector(".blob-code-deletion")) {
-          row.querySelectorAll(".blob-code-deletion").forEach((line) => {
-            codeChanges += "- " + line.textContent.trim() + "\n";
-          });
-        }
-        if (row.querySelector(".blob-code-addition")) {
-          row.querySelectorAll(".blob-code-addition").forEach((line) => {
-            codeChanges += "+ " + line.textContent.trim() + "\n";
-          });
-        }
-      }
+      fileBlocks.forEach((fileBlock) => {
+        // Get the file name from the header
+        const fileNameElement = fileBlock.querySelector(
+          ".file-header [data-path]"
+        );
+        const fileName = fileNameElement
+          ? fileNameElement.getAttribute("data-path")
+          : "Unknown File";
+
+        codeChanges += `\nFile: ${fileName}\n`;
+        codeChanges += "```\n";
+
+        // Get all changes for this file
+        const fileDiffs = fileBlock.querySelectorAll(".diff-table tr");
+        fileDiffs.forEach((row) => {
+          if (row.querySelector(".blob-code-deletion")) {
+            row.querySelectorAll(".blob-code-deletion").forEach((line) => {
+              codeChanges += "- " + line.textContent.trim() + "\n";
+            });
+          }
+          if (row.querySelector(".blob-code-addition")) {
+            row.querySelectorAll(".blob-code-addition").forEach((line) => {
+              codeChanges += "+ " + line.textContent.trim() + "\n";
+            });
+          }
+        });
+
+        codeChanges += "```\n";
+      });
+
       return codeChanges;
     }
 
@@ -311,12 +329,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             *   **Maintain a professional and respectful tone.**
     `;
 
-    // Construct the review prompt
-    const prompt = `Please review the following code changes from a GitHub pull request:
+    // Update the prompt to emphasize file name importance
+    const prompt = `Please review the following code changes from a GitHub pull request. Each file's changes are marked with its filename and enclosed in code blocks:
 
             Title: ${prData.title}
             Description: ${prData.description}
-            Code Changes:
+            
+            Changes by file:
             ${prData.codeChanges}
             ${
               customInstructions
@@ -324,6 +343,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                 : ""
             }
 
+            When providing feedback, please:
+            1. Always reference the specific file name when giving feedback about code changes
+            2. Use the exact file names as shown in the code blocks above
+            3. Format your response as follows for each issue:
+               - Start with "File: [exact filename]"
+               - Follow with [Category] - [Severity]
+               - Then provide your feedback
+            
             **Overall Summary (Separate Comment):**
 
               Before providing individual comments, create a overall comment that summarizes the key findings. Highlight the most important issues (especially those with High severity) and provide general recommendations.
@@ -588,15 +615,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       '<h3 class="result-subheading">$1</h3>'
     );
 
-    // Convert numbered lists with file paths - only show if both file path and line info exist
+    // Convert numbered lists without file paths - simpler version
     formattedText = formattedText.replace(
-      /^\d+\.\s+(?:File:\s+(.*?)(\s+\(Line:.*?\)))?/gim,
-      (match, filePath, lineInfo) => {
-        if (filePath && lineInfo) {
-          return `<div class="review-item"><div class="file-path">${filePath}</div><div class="line-info">${lineInfo}</div>`;
-        }
-        return '<div class="review-item">';
-      }
+      /^\d+\.\s+/gim,
+      '<div class="review-item">'
     );
 
     // Convert code blocks
