@@ -154,6 +154,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     chrome.storage.local.remove("apiKey");
   });
 
+  // Add this function at the beginning of the file, after the DOMContentLoaded event listener starts
+  function clearPreviousReview() {
+    const resultsDiv = document.getElementById("results");
+    const statusDiv = document.getElementById("status");
+    const summaryTitleDiv = document.getElementById("summary-title");
+
+    if (resultsDiv) resultsDiv.innerHTML = "";
+    if (statusDiv) statusDiv.textContent = "Starting new review...";
+    if (summaryTitleDiv) summaryTitleDiv.innerHTML = "";
+  }
+
   /**
    * Handle the review button click
    * Initiates the PR review process
@@ -161,6 +172,9 @@ document.addEventListener("DOMContentLoaded", async function () {
   reviewButton.addEventListener("click", async function () {
     reviewButton.disabled = true;
     reviewButton.textContent = "Reviewing...";
+
+    // Clear previous review immediately when starting new review
+    clearPreviousReview();
 
     try {
       // Get PR title from the current tab
@@ -182,7 +196,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       // Update UI and prepare for review
       statusDiv.textContent = `Reviewing PR: ${prTitle}...`;
-      resultsDiv.innerHTML = "";
 
       // Save current settings
       const apiKey = apiKeyInput.value;
@@ -427,6 +440,8 @@ document.addEventListener("DOMContentLoaded", async function () {
           prTitle: prData.title,
         },
       });
+    } finally {
+      hideLoading();
     }
   }
 
@@ -447,9 +462,26 @@ document.addEventListener("DOMContentLoaded", async function () {
         statusDiv.textContent = `Error reviewing PR: ${request.data.error}`;
         resultsDiv.innerHTML = "";
       } else {
+        const summaryTitleDiv = document.getElementById("summary-title");
+        if (summaryTitleDiv) {
+          summaryTitleDiv.innerHTML = `<h2>Review for: ${
+            request.data.prTitle
+          }</h2>
+            <p class="review-timestamp">Reviewed on: ${new Date().toLocaleString()}</p>`;
+        }
+
         statusDiv.textContent = `Review Complete for PR: ${request.data.prTitle}`;
         const formattedResults = formatReviewResults(request.data.summary);
         resultsDiv.innerHTML = formattedResults;
+
+        // Highlight code blocks
+        setTimeout(() => {
+          document.querySelectorAll("pre code").forEach((block) => {
+            if (!block.classList.contains("hljs")) {
+              hljs.highlightElement(block);
+            }
+          });
+        }, 100);
       }
     }
   });
@@ -634,5 +666,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     }, 0);
 
     return container;
+  }
+
+  function showLoading() {
+    // Implementation of showLoading function
+  }
+
+  function hideLoading() {
+    // Implementation of hideLoading function
+  }
+
+  function displayReview(review) {
+    // Implementation of displayReview function
   }
 });
