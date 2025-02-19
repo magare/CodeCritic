@@ -4,12 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GitHub PR Reviewer</title>
-    
+
     <!-- External CSS Dependencies -->
     <link rel="stylesheet" href="../lib/highlight/github-dark.min.css" />
     <link rel="stylesheet" href="./popup.css" />
-    
-    <!-- Highlight.js Core and Languages -->
+
+    <!-- Highlight.js Core and Language Modules -->
     <script src="../lib/highlight/highlight.min.js"></script>
     <script src="../lib/highlight/typescript.min.js"></script>
     <script src="../lib/highlight/javascript.min.js"></script>
@@ -32,36 +32,28 @@
     <script src="../lib/highlight/php.min.js"></script>
   </head>
   <body>
-    <!-- Main Container -->
     <div class="container">
-      <!-- Header Section with Logo -->
+      <!-- Header Section -->
       <div class="header">
-        <!-- Split logo text with images for styling -->
         <img src="../icons/icon48.png" alt="Code Critic Logo" class="logo" />
         <h1>ode </h1>
         <img src="../icons/icon48.png" alt="Code Critic Logo" class="logo" />
         <h1>ritic</h1>
       </div>
-      
-      <!-- API Key Configuration Section -->
+
+      <!-- API Key Configuration -->
       <div id="api-key-section">
-        <!-- API Key Input Form -->
         <div class="input-group" id="api-key-input-group" style="display: none;">
-          <input
-            type="password"
-            id="api-key"
-            placeholder="Enter your OpenAI API key"
-          />
+          <input type="password" id="api-key" placeholder="Enter your OpenAI API key" />
           <button id="save-api-key">Save</button>
         </div>
-        <!-- API Key Status Display -->
         <div id="api-key-status" style="display: none;">
           <span>API Key is set</span>
           <button id="change-api-key" class="link-button">Change API Key</button>
         </div>
       </div>
 
-      <!-- Model Selection Dropdown -->
+      <!-- Model Selection -->
       <div>
         <label for="model-select">Select Model:</label>
         <select id="model-select">
@@ -72,7 +64,7 @@
         </select>
       </div>
 
-      <!-- Custom Instructions Input -->
+      <!-- Custom Instructions -->
       <div>
         <label for="instructions">
           Review Instructions:
@@ -81,35 +73,27 @@
             <span class="tooltiptext">Provide custom instructions for the AI to follow during the review process.</span>
           </span>
         </label>
-        <textarea
-          id="instructions"
-          placeholder="Enter custom instructions for the AI reviewer"
-          rows="3"
-        ></textarea>
+        <textarea id="instructions" placeholder="Enter custom instructions for the AI reviewer" rows="3"></textarea>
       </div>
 
-      <!-- Status and Control Section -->
-      <div id="status" class="warning-status">Please set your OpenAI API key to start reviewing</div>
+      <!-- Review Control & Status -->
+      <div id="status" class="warning-status">
+        Please set your OpenAI API key to start reviewing
+      </div>
       <button id="review-button" disabled>Start Review</button>
-      <hr/>
+      <hr />
 
-      <!-- Results Display Section -->
+      <!-- Review Results -->
       <div id="summary-title"></div>
       <div id="results"></div>
       <div id="review-container">
-        <!-- Review Summary Section -->
         <div id="summary">
           <p id="summary-text"></p>
         </div>
-        <!-- Review Comments Section -->
         <div id="comments"></div>
       </div>
     </div>
 
-    <!-- Add your scripts at the end of body -->
     <script type="module" src="popup.js"></script>
   </body>
 </html>
-
-
-
