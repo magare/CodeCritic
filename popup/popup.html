@@ -4,11 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GitHub PR Reviewer</title>
-
     <!-- External CSS Dependencies -->
     <link rel="stylesheet" href="../lib/highlight/github-dark.min.css" />
     <link rel="stylesheet" href="./popup.css" />
-
     <!-- Highlight.js Core and Languages -->
     <script src="../lib/highlight/highlight.min.js"></script>
     <script src="../lib/highlight/typescript.min.js"></script>
@@ -41,6 +39,8 @@
         <h1>ritic</h1>
         <!-- Theme toggle button positioned in the top right corner -->
         <button id="theme-toggle" class="theme-toggle-button" title="Change Theme">🎨</button>
+        <!-- History Navigation Container (positioned below the theme button) -->
+        <div id="history-navigation"></div>
       </div>
 
       <!-- API Key Configuration -->

@@ -441,11 +441,18 @@ pre.result-code-block code {
   z-index: 100;
 }
 
-/* Theme Overrides */
+/* History Navigation (positioned below theme toggle) */
+#history-navigation {
+  position: absolute;
+  top: 40px;
+  right: 8px;
+  display: none;
+  gap: 4px;
+}
 
+/* Theme Overrides */
 /* Default Theme */
 .theme-default {
-  /* Uses :root values */
   --color-code-bg: #f6f8fa;
   --color-code-text: #24292f;
 }
@@ -475,7 +482,6 @@ pre.result-code-block code {
   --color-btn-primary-border: #1177bb;
   --color-header-bg: #1e1e1e;
   --color-header-text: #ffffff;
-  /* Code block colors for dark theme */
   --color-code-bg: #2d2d2d;
   --color-code-text: #f0f0f0;
 }
@@ -505,7 +511,6 @@ pre.result-code-block code {
   --color-btn-primary-border: #004488;
   --color-header-bg: #003366;
   --color-header-text: #ffffff;
-  /* Code block colors for blue theme */
   --color-code-bg: #d0e4f7;
   --color-code-text: #003366;
 }
@@ -531,11 +536,10 @@ pre.result-code-block code {
   --color-btn-active-bg: #7cbf64;
   --color-btn-active-border: #66aa52;
   --color-btn-primary-text: #ffffff;
-  --color-btn-primary-bg: #2e7d32;
+  --color-btn-primary-bg: #2e7f32;
   --color-btn-primary-border: #27632a;
   --color-header-bg: #1b5e20;
   --color-header-text: #ffffff;
-  /* Code block colors for green theme */
   --color-code-bg: #c8e6c9;
   --color-code-text: #1b5e20;
 }
@@ -565,7 +569,6 @@ pre.result-code-block code {
   --color-btn-primary-border: #380e72;
   --color-header-bg: #4a148c;
   --color-header-text: #ffffff;
-  /* Code block colors for purple theme */
   --color-code-bg: #e1bee7;
   --color-code-text: #4a148c;
 }
