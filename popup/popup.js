@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Theme definitions
   const themeClasses = [
-    "theme-default", // default uses :root values
+    "theme-default",
     "theme-dark",
     "theme-blue",
     "theme-green",
@@ -106,16 +106,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (scrollPosition) container.scrollTop = scrollPosition;
   }
 
-  function checkGitHubPRPage() {
+  // Updated page detection: supports only GitHub PRs and GitLab MRs.
+  function checkSupportedPage() {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       const currentTab = tabs[0];
-      if (currentTab && /github\.com\/.*\/.*\/pull\/.*/.test(currentTab.url)) {
+      const url = currentTab ? currentTab.url : "";
+      if (
+        /github\.com\/.*\/.*\/pull\/.*/.test(url) ||
+        /gitlab\.com\/.*\/.*\/(-\/)?merge_requests\/.*/.test(url)
+      ) {
         reviewButton.disabled = false;
-        statusDiv.textContent = "Ready to review PR";
+        statusDiv.textContent = "Ready to review PR/MR";
         statusDiv.classList.remove("warning-status");
       } else {
         reviewButton.disabled = true;
-        statusDiv.textContent = "Not a GitHub PR page";
+        statusDiv.textContent = "Not a supported PR/MR page";
         statusDiv.classList.add("warning-status");
       }
     });
@@ -125,7 +130,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (result.apiKey) {
       apiKeyInputGroup.style.display = "none";
       apiKeyStatus.style.display = "block";
-      checkGitHubPRPage();
+      checkSupportedPage();
     } else {
       apiKeyInputGroup.style.display = "flex";
       apiKeyStatus.style.display = "none";
@@ -142,7 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       chrome.storage.local.set({ apiKey }, () => {
         apiKeyInputGroup.style.display = "none";
         apiKeyStatus.style.display = "block";
-        checkGitHubPRPage();
+        checkSupportedPage();
       });
     } else {
       statusDiv.textContent = "Please enter a valid API key.";
@@ -176,16 +181,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         currentWindow: true,
       });
       const tabId = tab.id;
+      // Inline function to detect platform and extract the title.
       const [{ result: prTitle }] = await chrome.scripting.executeScript({
         target: { tabId },
-        function: () => {
-          const titleElem = document.querySelector(
-            ".gh-header-title .js-issue-title"
-          );
-          return titleElem ? titleElem.innerText : "Unknown PR";
+        function: function getPRTitleInline() {
+          const url = window.location.href;
+          if (/github\.com\/.*\/.*\/pull\/.*/.test(url)) {
+            const titleElem = document.querySelector(
+              ".gh-header-title .js-issue-title"
+            );
+            return titleElem ? titleElem.innerText : "Unknown PR";
+          } else if (
+            /gitlab\.com\/.*\/.*\/(-\/)?merge_requests\/.*/.test(url)
+          ) {
+            const titleElem = document.querySelector("h1.title");
+            return titleElem ? titleElem.innerText.trim() : "Unknown MR";
+          }
+          return "Unknown PR/MR";
         },
       });
-      statusDiv.textContent = `Reviewing PR: ${prTitle}...`;
+      statusDiv.textContent = `Reviewing: ${prTitle}...`;
 
       let apiKey = apiKeyInput.value.trim();
       if (!apiKey) {
@@ -202,7 +217,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      // Execute the review function in the PR page and wait for its returned result.
+      // Execute the review function in the page and await its result.
       const [injectedResult] = await chrome.scripting.executeScript({
         target: { tabId: tab.id },
         function: triggerReview,
@@ -213,10 +228,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       reviewButton.textContent = "Start Review";
 
       if (resultData.error) {
-        statusDiv.textContent = `Error reviewing PR: ${resultData.error}`;
+        statusDiv.textContent = `Error reviewing: ${resultData.error}`;
         resultsDiv.innerHTML = "";
       } else {
-        statusDiv.textContent = `Review Complete for PR: ${resultData.prTitle}`;
+        statusDiv.textContent = `Review Complete for: ${resultData.prTitle}`;
         const summaryTitleDiv = document.getElementById("summary-title");
         const reviewTime = new Date(resultData.timestamp).toLocaleString();
         summaryTitleDiv.innerHTML = `<h2>Review for: ${resultData.prTitle}</h2>
@@ -249,43 +264,99 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Injected function now returns the review result instead of sending a message.
+  // Injected function that detects the platform and extracts PR/MR data accordingly.
   async function triggerReview(apiKey, selectedModel, customInstructions) {
-    function getCodeChanges() {
-      const fileBlocks = document.querySelectorAll(".file");
+    function getPlatform() {
+      const url = window.location.href;
+      if (/github\.com\/.*\/.*\/pull\/.*/.test(url)) return "github";
+      if (/gitlab\.com\/.*\/.*\/(-\/)?merge_requests\/.*/.test(url))
+        return "gitlab";
+      return "unknown";
+    }
+
+    function getPRTitle(platform) {
+      if (platform === "github") {
+        const titleElem = document.querySelector(
+          ".gh-header-title .js-issue-title"
+        );
+        return titleElem ? titleElem.innerText : "Unknown PR";
+      } else if (platform === "gitlab") {
+        const titleElem = document.querySelector("h1.title");
+        return titleElem ? titleElem.innerText.trim() : "Unknown MR";
+      }
+      return "Unknown PR/MR";
+    }
+
+    function getPRDescription(platform) {
+      if (platform === "github") {
+        const descElem = document.querySelector(".comment-body");
+        return descElem ? descElem.innerText : "No description available.";
+      } else if (platform === "gitlab") {
+        const descElem =
+          document.querySelector(".description") ||
+          document.querySelector(".merge-request-description");
+        return descElem
+          ? descElem.innerText.trim()
+          : "No description available.";
+      }
+      return "No description available.";
+    }
+
+    function getCodeChanges(platform) {
       let changes = "";
-      fileBlocks.forEach((block) => {
-        const fileNameElem = block.querySelector(".file-header [data-path]");
-        const fileName = fileNameElem
-          ? fileNameElem.getAttribute("data-path")
-          : "Unknown File";
-        changes += `\nFile: ${fileName}\n\`\`\`\n`;
-        block.querySelectorAll(".diff-table tr").forEach((row) => {
-          row.querySelectorAll(".blob-code-deletion").forEach((line) => {
-            changes += `- ${line.textContent.trim()}\n`;
+      if (platform === "github") {
+        const fileBlocks = document.querySelectorAll(".file");
+        fileBlocks.forEach((block) => {
+          const fileNameElem = block.querySelector(".file-header [data-path]");
+          const fileName = fileNameElem
+            ? fileNameElem.getAttribute("data-path")
+            : "Unknown File";
+          changes += `\nFile: ${fileName}\n\`\`\`\n`;
+          block.querySelectorAll(".diff-table tr").forEach((row) => {
+            row.querySelectorAll(".blob-code-deletion").forEach((line) => {
+              changes += `- ${line.textContent.trim()}\n`;
+            });
+            row.querySelectorAll(".blob-code-addition").forEach((line) => {
+              changes += `+ ${line.textContent.trim()}\n`;
+            });
           });
-          row.querySelectorAll(".blob-code-addition").forEach((line) => {
-            changes += `+ ${line.textContent.trim()}\n`;
-          });
+          changes += "```\n";
         });
-        changes += "```\n";
-      });
+      } else if (platform === "gitlab") {
+        const fileBlocks = document.querySelectorAll(".diff-file");
+        fileBlocks.forEach((block) => {
+          const fileNameElem =
+            block.querySelector(".file-title-name") ||
+            block.querySelector(".filename");
+          const fileName = fileNameElem
+            ? fileNameElem.innerText.trim()
+            : "Unknown File";
+          changes += `\nFile: ${fileName}\n\`\`\`\n`;
+          block.querySelectorAll(".line-content").forEach((line) => {
+            if (line.closest(".line-addition")) {
+              changes += `+ ${line.innerText.trim()}\n`;
+            } else if (line.closest(".line-deletion")) {
+              changes += `- ${line.innerText.trim()}\n`;
+            }
+          });
+          changes += "```\n";
+        });
+      }
       return changes;
     }
 
+    const platform = getPlatform();
     const prData = {
-      title:
-        document.querySelector(".gh-header-title .js-issue-title")?.innerText ||
-        "Unknown PR",
-      description:
-        document.querySelector(".comment-body")?.innerText ||
-        "No description available.",
-      codeChanges: getCodeChanges(),
+      title: getPRTitle(platform),
+      description: getPRDescription(platform),
+      codeChanges: getCodeChanges(platform),
     };
 
     const systemPrompt = `
 You are an experienced software engineer specializing in code quality, security, and maintainability.
-Act as an AI code reviewer for GitHub pull requests.
+Act as an AI code reviewer for ${
+      platform === "github" ? "GitHub" : "GitLab"
+    } pull/merge requests.
 Analyze the provided code changes and offer constructive, actionable feedback with examples, prioritizing major issues.
     `;
     const prompt = `

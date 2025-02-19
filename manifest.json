@@ -4,7 +4,7 @@
   "version": "1.0",
   "description": "An extension to help review GitHub Pull Requests.",
   "permissions": ["activeTab", "storage", "scripting"],
-  "host_permissions": ["https://github.com/*"],
+  "host_permissions": ["https://github.com/*", "https://gitlab.com/*"],
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {}
