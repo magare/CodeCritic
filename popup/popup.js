@@ -37,6 +37,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const apiKeyStatus = document.getElementById("api-key-status");
   const changeApiKeyButton = document.getElementById("change-api-key");
   const container = document.querySelector(".container");
+  const themeToggleButton = document.getElementById("theme-toggle");
 
   if (
     !apiKeyInput ||
@@ -49,10 +50,47 @@ document.addEventListener("DOMContentLoaded", async () => {
     !apiKeyInputGroup ||
     !apiKeyStatus ||
     !changeApiKeyButton ||
-    !container
+    !container ||
+    !themeToggleButton
   ) {
     return;
   }
+
+  // Theme definitions
+  const themeClasses = [
+    "theme-default", // default uses :root values
+    "theme-dark",
+    "theme-blue",
+    "theme-green",
+    "theme-purple",
+  ];
+
+  // Load current theme from storage or default to 0
+  chrome.storage.sync.get(["themeIndex"], (data) => {
+    let currentTheme = data.themeIndex !== undefined ? data.themeIndex : 0;
+    applyTheme(currentTheme);
+  });
+
+  // Apply the theme class on the container
+  function applyTheme(index) {
+    // Remove any existing theme classes
+    themeClasses.forEach((cls) => container.classList.remove(cls));
+    // For default theme, you may not need a class since :root applies default vars;
+    // however, to keep things consistent, add "theme-default"
+    const newTheme = themeClasses[index];
+    container.classList.add(newTheme);
+    // Save the theme index
+    chrome.storage.sync.set({ themeIndex: index });
+  }
+
+  // Toggle theme on button click (cycle through the array)
+  themeToggleButton.addEventListener("click", () => {
+    chrome.storage.sync.get(["themeIndex"], (data) => {
+      let currentTheme = data.themeIndex !== undefined ? data.themeIndex : 0;
+      let nextTheme = (currentTheme + 1) % themeClasses.length;
+      applyTheme(nextTheme);
+    });
+  });
 
   // Initialize UI state and load saved settings/reviews
   loadSettings();
@@ -380,11 +418,12 @@ Include an overall summary comment and a brief TL;DR at the end.
     }
   }
 
+  // Format the markdown review results into HTML for display
   function formatReviewResults(markdownText) {
     if (!markdownText) return "";
     let formattedText = markdownText;
 
-    // Replace special text patterns like "[Code Quality] - [Medium Severity]"
+    // Replace special text patterns like "[Category] - [Severity]"
     formattedText = formattedText.replace(
       /\[(.*?)\]\s*-\s*\[(High(?:\s*Severity)?|Medium(?:\s*Severity)?|Low(?:\s*Severity)?)\]/g,
       (match, category, severity) => {
@@ -410,7 +449,7 @@ Include an overall summary comment and a brief TL;DR at the end.
       }
     );
 
-    // Additional markdown formatting remains unchanged
+    // Additional markdown formatting
     formattedText = formattedText.replace(
       /^## (.*$)/gim,
       '<h2 class="result-heading">$1</h2>'
@@ -446,7 +485,7 @@ Include an overall summary comment and a brief TL;DR at the end.
       "</div>"
     );
 
-    // After injecting the formatted HTML, force highlight.js to colorize all code blocks.
+    // After injecting, force highlight.js to colorize all code blocks.
     setTimeout(() => {
       document.querySelectorAll("pre code").forEach((block) => {
         hljs.highlightElement(block);
